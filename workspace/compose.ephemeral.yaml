@@ -1,0 +1,10 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    restart: "no"
+    ports:
+      - "5678:5678"
+    environment:
+      N8N_ENCRYPTION_KEY: ephemeral-key-not-for-production
+      GENERIC_TIMEZONE: America/New_York
+      TZ: America/New_York
