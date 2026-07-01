@@ -10,6 +10,7 @@ Docker Compose deployment of [n8n](https://n8n.io) workflow automation on a sing
 |---|---|---|
 | **Production** | `compose.yaml` | Caddy reverse proxy, automatic TLS, PostgreSQL, persistent volumes |
 | **VPN** | `compose.vpn.yaml` | Direct port access over VPN tunnel, PostgreSQL, persistent volumes |
+| **VPN (SQLite)** | `compose.vpn.sqlite.yaml` | Direct port access over VPN tunnel, SQLite, persistent volume; no database container to manage |
 | **Ephemeral** | `compose.ephemeral.yaml` | Single container, SQLite, no volumes; data is not retained across restarts |
 
 ### Production
@@ -28,6 +29,15 @@ Exposes n8n on port 5678. Port 5678 must be restricted to VPN-sourced traffic on
 ```bash
 cd workspace
 docker compose -f compose.vpn.yaml up -d
+```
+
+### VPN (SQLite)
+
+Same access pattern as VPN, but uses SQLite instead of PostgreSQL — no separate database container to run or back up. Data persists in the `n8n_data` volume across restarts and redeployments. Port 5678 must be restricted to VPN-sourced traffic only. Set `WEBHOOK_URL=http://<VPS-IP>:5678` and `N8N_PROXY_HOPS=0` in `.env`. Only `N8N_ENCRYPTION_KEY` (and optionally `GENERIC_TIMEZONE`/`TZ`) are required — the `DB_POSTGRESDB_*` variables are not used by this profile.
+
+```bash
+cd workspace
+docker compose -f compose.vpn.sqlite.yaml up -d
 ```
 
 ### Ephemeral
@@ -87,7 +97,8 @@ Review the [n8n changelog](https://github.com/n8n-io/n8n/releases) before updati
 
 | Item | Recommended Method |
 |---|---|
-| Workflows and credentials | Scheduled `pg_dump` to off-site storage |
+| Workflows and credentials (PostgreSQL profiles) | Scheduled `pg_dump` to off-site storage |
+| Workflows and credentials (SQLite profile) | Snapshot/copy of the `n8n_data` volume's `database.sqlite` file |
 | `N8N_ENCRYPTION_KEY` | External secrets manager |
 | `n8n_data` Docker volume | Snapshot alongside the database |
 
@@ -99,6 +110,7 @@ Review the [n8n changelog](https://github.com/n8n-io/n8n/releases) before updati
 workspace/
 ├── compose.yaml              # Production profile
 ├── compose.vpn.yaml          # VPN profile
+├── compose.vpn.sqlite.yaml   # VPN profile (SQLite)
 ├── compose.ephemeral.yaml    # Ephemeral profile
 ├── Caddyfile                 # Caddy configuration (production only)
 ├── .env.example              # Environment variable template
