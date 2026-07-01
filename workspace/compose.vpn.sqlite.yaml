@@ -1,6 +1,6 @@
 services:
   n8n:
-    image: docker.n8n.io/n8nio/n8n:1.93.0
+    image: docker.n8n.io/n8nio/n8n:2.28.4
     restart: unless-stopped
     environment:
       DB_TYPE: sqlite

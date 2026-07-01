@@ -83,13 +83,19 @@ docker compose -f compose.ephemeral.yaml down
 
 ## Updates
 
-The n8n image is pinned to a specific version tag in each Compose file. To update:
+The n8n image is pinned to a specific version tag (currently `2.28.4`) in `compose.yaml`, `compose.vpn.yaml`, and `compose.vpn.sqlite.yaml`. `docker compose pull` re-pulls whatever tag is already set — it will not fetch a newer version until the tag itself is bumped. Per the [official update instructions](https://docs.n8n.io/deploy/host-n8n/install-options/install-with-docker#updating):
 
-```bash
-cd workspace
-docker compose pull
-docker compose up -d
-```
+1. Edit the `image:` tag in the relevant Compose file to the new version.
+2. Pull and recreate the container (stop before starting so the volume-backed database isn't touched by two versions at once):
+   ```bash
+   cd workspace
+   docker compose -f <compose-file> pull
+   docker compose -f <compose-file> down
+   docker compose -f <compose-file> up -d
+   ```
+   e.g. `docker compose -f compose.vpn.sqlite.yaml pull` for the VPN (SQLite) profile. For the plain `compose.yaml` production profile, `-f` can be omitted.
+
+The `ephemeral` profile tracks `:latest`, so no tag edit is needed there — just `pull` and recreate (it has no persistent data regardless).
 
 Review the [n8n changelog](https://github.com/n8n-io/n8n/releases) before updating. Update monthly or immediately when a security patch is released.
 
