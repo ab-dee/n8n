@@ -35,6 +35,8 @@ docker compose -f compose.vpn.yaml up -d
 
 Same access pattern as VPN, but uses SQLite instead of PostgreSQL — no separate database container to run or back up. Data persists in the `n8n_data` volume across restarts and redeployments. Port 5678 must be restricted to VPN-sourced traffic only. Set `WEBHOOK_URL=http://<VPS-IP>:5678` and `N8N_PROXY_HOPS=0` in `.env`. Only `N8N_ENCRYPTION_KEY` (and optionally `GENERIC_TIMEZONE`/`TZ`) are required — the `DB_POSTGRESDB_*` variables are not used by this profile.
 
+This profile sets `N8N_SECURE_COOKIE=false`. It's accessed over plain HTTP (e.g. via a Tailscale IP), and browsers won't store/send a `Secure` cookie on a non-HTTPS origin — Tailscale's own tunnel encryption doesn't change what the browser sees, so without this the UI shows a secure-cookie warning and sessions won't persist.
+
 ```bash
 cd workspace
 docker compose -f compose.vpn.sqlite.yaml up -d

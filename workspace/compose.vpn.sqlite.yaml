@@ -4,6 +4,7 @@ services:
     restart: unless-stopped
     environment:
       DB_TYPE: sqlite
+      N8N_SECURE_COOKIE: "false"
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
       GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-America/New_York}
       TZ: ${TZ:-America/New_York}
